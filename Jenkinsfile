@@ -23,14 +23,14 @@ pipeline {
         stage('Install Terraform') {
             steps {
                 sh '''
-                echo "Installing terraform..."
-                curl -O https://releases.hashicorp.com/terraform/1.12.2/terraform_1.12.2_linux_amd64.zip
-				unzip terraform_1.12.2_linux_amd64.zip
-				chmod +x ./terraform
-				mkdir -p $HOME/bin
-				cp ./terraform $HOME/bin/terraform
-				export PATH=$HOME/bin:$PATH
-				terraform version
+					echo "Installing terraform..."
+					curl -O https://releases.hashicorp.com/terraform/1.12.2/terraform_1.12.2_linux_amd64.zip
+					unzip terraform_1.12.2_linux_amd64.zip
+					chmod +x ./terraform
+					mkdir -p $HOME/bin
+					cp ./terraform $HOME/bin/terraform
+					export PATH=$HOME/bin:$PATH
+					terraform version
                 '''
             }
         }
@@ -42,10 +42,10 @@ pipeline {
 					withAWS(region: "${env.AWS_REGION}", credentials: 'AWS') {
 						try {
 							sh '''
-							cd app
-							terraform init
-							terraform plan
-							//terraform apply -auto-approve
+								cd app
+								terraform init
+								terraform plan
+								terraform apply -auto-approve
 							'''
 						} catch (exception) {
 							echo "❌ Failed to create EKS cluster: ${exception}"
