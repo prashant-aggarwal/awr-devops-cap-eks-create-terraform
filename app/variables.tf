@@ -6,7 +6,7 @@ variable "cluster_name" {
   default = "pa-cap-eks-cluster"
 }
 
-variable "k8s_version" {
+variable "cluster_version" {
   default = "1.32"
 }
 
