@@ -1,5 +1,5 @@
 module "eks_cluster" {
-  source = "../TF_modules"
+  source = "../modules"
 
   cluster_name    = var.cluster_name
   cluster_version = var.cluster_version
