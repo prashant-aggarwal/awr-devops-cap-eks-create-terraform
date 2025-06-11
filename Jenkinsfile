@@ -38,7 +38,7 @@ pipeline {
 		stage('Deploy Terraform') {
             steps {
                 sh '''
-					ls -la
+					cd scripts
                     terraform --version
                     terraform init
                     terraform plan
