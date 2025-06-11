@@ -19,7 +19,7 @@ pipeline {
             }
         }
 
-		// Stage 1 - Install Terraform
+		// Stage 2 - Install Terraform
         stage('Install Terraform') {
             steps {
                 sh '''
@@ -35,7 +35,8 @@ pipeline {
             }
         }
 		
-		stage('Deploy Terraform') {
+		// Stage 3 - Deploy EKS Cluster
+        stage('Deploy EKS Cluster') {
             steps {
 				script {
 					// Install AWS Steps plugin to make this work
