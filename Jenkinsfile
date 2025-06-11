@@ -37,13 +37,23 @@ pipeline {
 		
 		stage('Deploy Terraform') {
             steps {
-                sh '''
-					cd app
-                    terraform init
-                    terraform plan
-                    //terraform apply -auto-approve
-                '''
-            }
+				script {
+					// Install AWS Steps plugin to make this work
+					withAWS(region: "${env.AWS_REGION}", credentials: 'AWS') {
+						try {
+							sh '''
+							cd app
+							terraform init
+							terraform plan
+							//terraform apply -auto-approve
+							'''
+						} catch (exception) {
+							echo "❌ Failed to create EKS cluster: ${exception}"
+							error("Halting pipeline due to EKS cluster creation failure.")
+						}
+					}
+				}
+			}
 		}
     }
 
