@@ -38,8 +38,7 @@ pipeline {
 		stage('Deploy Terraform') {
             steps {
                 sh '''
-					cd scripts
-                    terraform --version
+					cd app
                     terraform init
                     terraform plan
                     //terraform apply -auto-approve
