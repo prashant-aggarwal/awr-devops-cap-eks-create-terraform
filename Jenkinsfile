@@ -20,7 +20,7 @@ pipeline {
         }
 
 		// Stage 1 - Install Terraform
-        stage('Install terraform') {
+        stage('Install Terraform') {
             steps {
                 sh '''
                 echo "Installing terraform..."
@@ -34,6 +34,18 @@ pipeline {
                 '''
             }
         }
+		
+		stage('Deploy Terraform') {
+            steps {
+                sh '''
+					ls -la
+                    terraform --version
+                    terraform init
+                    terraform plan
+                    //terraform apply -auto-approve
+                '''
+            }
+		}
     }
 
     // Cleanup the workspace in the end
