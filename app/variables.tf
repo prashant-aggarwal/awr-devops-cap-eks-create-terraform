@@ -13,3 +13,11 @@ variable "cluster_version" {
 variable "azs" {
   default = ["us-east-1a", "us-east-1b"]
 }
+
+variable "s3_tfstate_bucket_name" {
+  default = "pa-capstone-terraform-deployment-bucket"
+}
+
+variable "s3_tfstate_bucket_key" {
+  default = "envs/dev/terraform.tfstate"
+}
