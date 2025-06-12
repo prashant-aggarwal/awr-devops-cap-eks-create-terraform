@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+	// Set the environment variables
+    environment {
+        PATH = "${env.HOME}/bin:${env.PATH}"
+    }
+
 	// Multistage pipeline
     stages {
 		// Stage 1 - Checkout code repository
