@@ -118,12 +118,3 @@ resource "aws_iam_role_policy_attachment" "default_AmazonEC2ContainerRegistryRea
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   role       = aws_iam_role.eks_node_group.name
 }
-
-terraform {
-  backend "s3" {
-    bucket         = var.s3_tfstate_bucket_name
-    key            = var.s3_tfstate_bucket_key
-    region         = var.region
-    encrypt        = true
-  }
-}
