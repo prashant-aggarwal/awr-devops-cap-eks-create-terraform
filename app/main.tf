@@ -8,10 +8,5 @@ module "eks_cluster" {
 }
 
 terraform {
-  backend "s3" {
-    bucket         = var.s3_tfstate_bucket_name
-    key            = var.s3_tfstate_bucket_key
-    region         = var.region
-    encrypt        = true
-  }
+  backend "s3" {}
 }
