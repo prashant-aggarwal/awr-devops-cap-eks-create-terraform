@@ -36,12 +36,10 @@ module "eks" {
 module "node_groups" {
   source = "../modules/node-groups"
 
-  vpc_cidr             = var.vpc_cidr
-  availability_zones   = var.availability_zones
-  private_subnet_cidrs = var.private_subnet_cidrs
-  public_subnet_cidrs  = var.public_subnet_cidrs
-  
-  cluster_name     = module.eks.cluster_name
+  node_groups = var.node_groups
+
+  cluster_name = module.eks.cluster_name
+  subnet_ids   = module.vpc.private_subnet_ids
   
   depends_on = [module.eks]
 }

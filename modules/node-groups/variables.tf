@@ -3,16 +3,6 @@ variable "cluster_name" {
   type        = string
 }
 
-variable "cluster_endpoint" {
-  description = "EKS cluster endpoint"
-  type        = string
-}
-
-variable "cluster_ca_cert" {
-  description = "EKS cluster certificate authority"
-  type        = string
-}
-
 variable "subnet_ids" {
   description = "List of subnet IDs for the node groups"
   type        = list(string)
