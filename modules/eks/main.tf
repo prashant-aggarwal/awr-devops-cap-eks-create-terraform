@@ -63,12 +63,7 @@ resource "aws_eks_cluster" "main" {
     service_ipv4_cidr = var.service_ipv4_cidr
   }
 
-  dynamic "enabled_cluster_log_types" {
-    for_each = var.enable_cluster_logging ? [1] : []
-    content {
-      log_types = var.log_types
-    }
-  }
+  enabled_cluster_log_types = var.enable_cluster_logging ? var.log_types : []
 
   depends_on = [
     aws_iam_role_policy_attachment.eks_cluster_policy,
