@@ -10,7 +10,7 @@ data "aws_caller_identity" "current" {}
 
 # VPC Module
 module "vpc" {
-  source = "./modules/vpc"
+  source = "../modules/vpc"
 
   cluster_name         = var.cluster_name
   vpc_cidr            = var.vpc_cidr
@@ -21,7 +21,7 @@ module "vpc" {
 
 # EKS Cluster Module
 module "eks" {
-  source = "./modules/eks"
+  source = "../modules/eks"
 
   cluster_name           = var.cluster_name
   cluster_version        = var.cluster_version
@@ -34,7 +34,7 @@ module "eks" {
 
 # Node Groups Module
 module "node_groups" {
-  source = "./modules/node-groups"
+  source = "../modules/node-groups"
 
   cluster_name     = module.eks.cluster_name
   cluster_endpoint = module.eks.cluster_endpoint
@@ -48,7 +48,7 @@ module "node_groups" {
 
 # Fargate Profiles Module
 module "fargate" {
-  source = "./modules/fargate"
+  source = "../modules/fargate"
 
   cluster_name = module.eks.cluster_name
   subnet_ids   = module.vpc.private_subnet_ids
@@ -60,7 +60,7 @@ module "fargate" {
 
 # EKS Addons Module
 module "addons" {
-  source = "./modules/addons"
+  source = "../modules/addons"
 
   cluster_name    = module.eks.cluster_name
   cluster_version = var.cluster_version
@@ -73,7 +73,7 @@ module "addons" {
 
 # Service Accounts Module
 module "service_accounts" {
-  source = "./modules/service-accounts"
+  source = "../modules/service-accounts"
 
   cluster_name           = module.eks.cluster_name
   oidc_issuer_url       = module.eks.cluster_oidc_issuer_url
