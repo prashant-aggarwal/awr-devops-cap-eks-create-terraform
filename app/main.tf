@@ -40,10 +40,8 @@ module "node_groups" {
   availability_zones   = var.availability_zones
   private_subnet_cidrs = var.private_subnet_cidrs
   public_subnet_cidrs  = var.public_subnet_cidrs
-  node_groups          = var.node_groups
   
   cluster_name     = module.eks.cluster_name
-  cluster_endpoint = module.eks.cluster_endpoint
   
   depends_on = [module.eks]
 }
