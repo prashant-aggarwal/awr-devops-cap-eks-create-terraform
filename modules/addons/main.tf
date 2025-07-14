@@ -5,7 +5,7 @@ resource "aws_eks_addon" "main" {
   cluster_name             = var.cluster_name
   addon_name               = each.key
   addon_version            = each.value.version == "latest" ? null : each.value.version
-  configuration_values     = each.value.configuration_values != "" ? each.value.configuration_values : null
+  configuration_values     = each.value.configuration_values != "" ? jsonencode(each.value.configuration_values) : null
   resolve_conflicts        = each.value.resolve_conflicts
 
   depends_on = [

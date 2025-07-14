@@ -118,43 +118,43 @@ variable "addons" {
   description = "EKS addons configuration"
   type = map(object({
     version               = string
-    configuration_values = string
+    configuration_values = any
     resolve_conflicts    = string
   }))
   default = {
     vpc-cni = {
       version = "latest"
-      configuration_values = jsonencode({
+      configuration_values = {
         env = {
-          ENABLE_PREFIX_DELEGATION        = "true"
-          ENABLE_POD_ENI                 = "true"
+          ENABLE_PREFIX_DELEGATION           = "true"
+          ENABLE_POD_ENI                     = "true"
           POD_SECURITY_GROUP_ENFORCING_MODE = "standard"
         }
         enableNetworkPolicy = "true"
         nodeAgent = {
           enablePolicyEventLogs = "true"
         }
-      })
+      }
       resolve_conflicts = "OVERWRITE"
     }
     coredns = {
       version               = "latest"
-      configuration_values = ""
+      configuration_values = {}
       resolve_conflicts    = "OVERWRITE"
     }
     kube-proxy = {
       version               = "latest"
-      configuration_values = ""
+      configuration_values = {}
       resolve_conflicts    = "OVERWRITE"
     }
     aws-ebs-csi-driver = {
       version               = "latest"
-      configuration_values = ""
+      configuration_values = {}
       resolve_conflicts    = "OVERWRITE"
     }
     amazon-cloudwatch-observability = {
       version               = "latest"
-      configuration_values = ""
+      configuration_values = {}
       resolve_conflicts    = "OVERWRITE"
     }
   }
