@@ -3,37 +3,34 @@ variable "cluster_name" {
   type        = string
 }
 
-variable "cluster_endpoint" {
-  description = "EKS cluster endpoint"
+variable "cluster_version" {
+  description = "Kubernetes version for the EKS cluster"
   type        = string
 }
 
-variable "cluster_ca_cert" {
-  description = "EKS cluster certificate authority"
+variable "vpc_id" {
+  description = "ID of the VPC"
   type        = string
 }
 
 variable "subnet_ids" {
-  description = "List of subnet IDs for the node groups"
+  description = "List of subnet IDs"
   type        = list(string)
 }
 
-variable "node_groups" {
-  description = "Configuration for EKS node groups"
-  type = map(object({
-    instance_types     = list(string)
-    capacity_type      = string
-    min_size          = number
-    max_size          = number
-    desired_size      = number
-    volume_encrypted  = bool
-    ami_type          = string
-    disk_size         = number
-  }))
+variable "service_ipv4_cidr" {
+  description = "CIDR block for Kubernetes service IPs"
+  type        = string
 }
 
-variable "ssh_key_name" {
-  description = "EC2 Key Pair name for SSH access to nodes"
-  type        = string
-  default     = null
+variable "enable_cluster_logging" {
+  description = "Enable EKS cluster logging"
+  type        = bool
+  default     = true
+}
+
+variable "log_types" {
+  description = "List of log types to enable"
+  type        = list(string)
+  default     = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 }

@@ -1,6 +1,6 @@
-# Node Group IAM Role
-resource "aws_iam_role" "node_group" {
-  name = "${var.cluster_name}-node-group-role"
+# EKS Cluster IAM Role
+resource "aws_iam_role" "eks_cluster" {
+  name = "${var.cluster_name}-eks-cluster-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -9,84 +9,92 @@ resource "aws_iam_role" "node_group" {
         Action = "sts:AssumeRole"
         Effect = "Allow"
         Principal = {
-          Service = "ec2.amazonaws.com"
+          Service = "eks.amazonaws.com"
         }
       }
     ]
   })
 }
 
-# Attach required policies to node group role
-resource "aws_iam_role_policy_attachment" "node_group_AmazonEKSWorkerNodePolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = aws_iam_role.node_group.name
+# Attach required policies to EKS cluster role
+resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  role       = aws_iam_role.eks_cluster.name
 }
 
-resource "aws_iam_role_policy_attachment" "node_group_AmazonEKS_CNI_Policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = aws_iam_role.node_group.name
-}
+# EKS Cluster Security Group
+resource "aws_security_group" "eks_cluster" {
+  name_prefix = "${var.cluster_name}-cluster-"
+  vpc_id      = var.vpc_id
 
-resource "aws_iam_role_policy_attachment" "node_group_AmazonEC2ContainerRegistryReadOnly" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = aws_iam_role.node_group.name
-}
-
-resource "aws_iam_role_policy_attachment" "node_group_AmazonEBSCSIDriverPolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
-  role       = aws_iam_role.node_group.name
-}
-
-resource "aws_iam_role_policy_attachment" "node_group_CloudWatchAgentServerPolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-  role       = aws_iam_role.node_group.name
-}
-
-resource "aws_iam_role_policy_attachment" "node_group_AutoScalingFullAccess" {
-  policy_arn = "arn:aws:iam::aws:policy/AutoScalingFullAccess"
-  role       = aws_iam_role.node_group.name
-}
-
-resource "aws_iam_role_policy_attachment" "node_group_XRayDaemonWriteAccess" {
-  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
-  role       = aws_iam_role.node_group.name
-}
-
-# EKS Node Groups
-resource "aws_eks_node_group" "main" {
-  for_each = var.node_groups
-
-  cluster_name    = var.cluster_name
-  node_group_name = each.key
-  node_role_arn   = aws_iam_role.node_group.arn
-  subnet_ids      = var.subnet_ids
-
-  capacity_type  = each.value.capacity_type
-  instance_types = each.value.instance_types
-  ami_type       = each.value.ami_type
-  disk_size      = each.value.disk_size
-
-  scaling_config {
-    desired_size = each.value.desired_size
-    max_size     = each.value.max_size
-    min_size     = each.value.min_size
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-  remote_access {
-    ec2_ssh_key = var.ssh_key_name
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.cluster_name}-cluster-sg"
+  }
+}
+
+# EKS Cluster
+resource "aws_eks_cluster" "main" {
+  name     = var.cluster_name
+  role_arn = aws_iam_role.eks_cluster.arn
+  version  = var.cluster_version
+
+  vpc_config {
+    subnet_ids              = var.subnet_ids
+    endpoint_private_access = true
+    endpoint_public_access  = true
+    security_group_ids      = [aws_security_group.eks_cluster.id]
+  }
+
+  kubernetes_network_config {
+    service_ipv4_cidr = var.service_ipv4_cidr
+  }
+
+  dynamic "enabled_cluster_log_types" {
+    for_each = var.enable_cluster_logging ? [1] : []
+    content {
+      log_types = var.log_types
+    }
   }
 
   depends_on = [
-    aws_iam_role_policy_attachment.node_group_AmazonEKSWorkerNodePolicy,
-    aws_iam_role_policy_attachment.node_group_AmazonEKS_CNI_Policy,
-    aws_iam_role_policy_attachment.node_group_AmazonEC2ContainerRegistryReadOnly,
-    aws_iam_role_policy_attachment.node_group_AmazonEBSCSIDriverPolicy,
-    aws_iam_role_policy_attachment.node_group_CloudWatchAgentServerPolicy,
-    aws_iam_role_policy_attachment.node_group_AutoScalingFullAccess,
-    aws_iam_role_policy_attachment.node_group_XRayDaemonWriteAccess,
+    aws_iam_role_policy_attachment.eks_cluster_policy,
+    aws_cloudwatch_log_group.eks_cluster
   ]
+}
+
+# CloudWatch Log Group for EKS
+resource "aws_cloudwatch_log_group" "eks_cluster" {
+  count = var.enable_cluster_logging ? 1 : 0
+
+  name              = "/aws/eks/${var.cluster_name}/cluster"
+  retention_in_days = 7
+}
+
+# OIDC Identity Provider
+data "tls_certificate" "eks" {
+  url = aws_eks_cluster.main.identity[0].oidc[0].issuer
+}
+
+resource "aws_iam_openid_connect_provider" "eks" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.eks.certificates[0].sha1_fingerprint]
+  url             = aws_eks_cluster.main.identity[0].oidc[0].issuer
 
   tags = {
-    Name = "${var.cluster_name}-${each.key}"
+    Name = "${var.cluster_name}-eks-irsa"
   }
 }
