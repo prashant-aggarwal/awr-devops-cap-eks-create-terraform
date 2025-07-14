@@ -6,7 +6,8 @@ resource "aws_eks_addon" "main" {
   addon_name               = each.key
   addon_version            = each.value.version == "latest" ? null : each.value.version
   configuration_values     = each.value.configuration_values != "" ? jsonencode(each.value.configuration_values) : null
-  resolve_conflicts        = each.value.resolve_conflicts
+  resolve_conflicts_on_create = each.value.resolve_conflicts_on_create
+  resolve_conflicts_on_update = each.value.resolve_conflicts_on_update
 
   depends_on = [
     aws_iam_role.addon_role

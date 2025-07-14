@@ -67,27 +67,32 @@ addons = {
           enablePolicyEventLogs = true
         }
       }
-    resolve_conflicts = "OVERWRITE"
+      resolve_conflicts_on_create = "OVERWRITE"
+      resolve_conflicts_on_update = "PRESERVE"
   }
   coredns = {
     version               = "latest"
     configuration_values = ""
-    resolve_conflicts    = "OVERWRITE"
+    resolve_conflicts_on_create = "OVERWRITE"
+    resolve_conflicts_on_update = "PRESERVE"
   }
   kube-proxy = {
     version               = "latest"
     configuration_values = ""
-    resolve_conflicts    = "OVERWRITE"
+    resolve_conflicts_on_create = "OVERWRITE"
+    resolve_conflicts_on_update = "PRESERVE"
   }
   aws-ebs-csi-driver = {
     version               = "latest"
     configuration_values = ""
-    resolve_conflicts    = "OVERWRITE"
+    resolve_conflicts_on_create = "OVERWRITE"
+    resolve_conflicts_on_update = "PRESERVE"
   }
   amazon-cloudwatch-observability = {
     version               = "latest"
     configuration_values = ""
-    resolve_conflicts    = "OVERWRITE"
+    resolve_conflicts_on_create = "OVERWRITE"
+    resolve_conflicts_on_update = "PRESERVE"
   }
 }
 

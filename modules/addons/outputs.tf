@@ -3,7 +3,7 @@ output "addons" {
   value = {
     for k, v in aws_eks_addon.main : k => {
       arn    = v.arn
-      status = v.status
+      status = v.addon_status
     }
   }
 }
