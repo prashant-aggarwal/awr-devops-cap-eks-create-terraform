@@ -1,9 +1,10 @@
 output "addons" {
-  description = "EKS addons information"
+  description = "EKS addons basic info"
   value = {
     for k, v in aws_eks_addon.main : k => {
-      arn    = v.arn
-      status = v.addon_status
+      arn            = v.arn
+      addon_name     = v.addon_name
+      addon_version  = v.addon_version
     }
   }
 }
