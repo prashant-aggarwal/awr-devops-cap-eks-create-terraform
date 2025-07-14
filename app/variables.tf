@@ -117,8 +117,8 @@ variable "fargate_profiles" {
 variable "addons" {
   description = "EKS addons configuration"
   type = map(object({
-    version               = string
-    configuration_values = any
+    version              = string
+    configuration_values = map(any)
     resolve_conflicts    = string
   }))
   default = {
