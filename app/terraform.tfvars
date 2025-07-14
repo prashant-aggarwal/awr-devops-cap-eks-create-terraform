@@ -54,21 +54,22 @@ fargate_profiles = {
 
 # EKS Addons Configuration
 addons = {
+addons = {
   vpc-cni = {
     version = "latest"
     configuration_values = {
-        env = {
-          ENABLE_PREFIX_DELEGATION            = true
-          ENABLE_POD_ENI                      = true
-          POD_SECURITY_GROUP_ENFORCING_MODE  = "standard"
-        }
-        enableNetworkPolicy = true
-        nodeAgent = {
-          enablePolicyEventLogs = true
-        }
+      env = {
+        ENABLE_PREFIX_DELEGATION            = "true"
+        ENABLE_POD_ENI                      = "true"
+        POD_SECURITY_GROUP_ENFORCING_MODE  = "standard"
       }
-      resolve_conflicts_on_create = "OVERWRITE"
-      resolve_conflicts_on_update = "PRESERVE"
+      enableNetworkPolicy = "true"
+      nodeAgent = {
+        enablePolicyEventLogs = "true"
+      }
+    }
+    resolve_conflicts_on_create = "OVERWRITE"
+    resolve_conflicts_on_update = "PRESERVE"
   }
   coredns = {
     version               = "latest"

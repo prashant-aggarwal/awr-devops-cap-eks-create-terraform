@@ -123,13 +123,13 @@ variable "addons" {
       version = "latest"
       configuration_values = {
         env = {
-          ENABLE_PREFIX_DELEGATION            = true
-          ENABLE_POD_ENI                      = true
+          ENABLE_PREFIX_DELEGATION            = "true"
+          ENABLE_POD_ENI                      = "true"
           POD_SECURITY_GROUP_ENFORCING_MODE  = "standard"
         }
-        enableNetworkPolicy = true
+        enableNetworkPolicy = "true"
         nodeAgent = {
-          enablePolicyEventLogs = true
+          enablePolicyEventLogs = "true"
         }
       }
       resolve_conflicts_on_create = "OVERWRITE"
