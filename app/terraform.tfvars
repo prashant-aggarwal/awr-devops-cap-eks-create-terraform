@@ -56,17 +56,17 @@ fargate_profiles = {
 addons = {
   vpc-cni = {
     version = "latest"
-    configuration_values = jsonencode({
-      env = {
-        ENABLE_PREFIX_DELEGATION        = "true"
-        ENABLE_POD_ENI                 = "true"
-        POD_SECURITY_GROUP_ENFORCING_MODE = "standard"
+    configuration_values = {
+        env = {
+          ENABLE_PREFIX_DELEGATION            = true
+          ENABLE_POD_ENI                      = true
+          POD_SECURITY_GROUP_ENFORCING_MODE  = "standard"
+        }
+        enableNetworkPolicy = true
+        nodeAgent = {
+          enablePolicyEventLogs = true
+        }
       }
-      enableNetworkPolicy = "true"
-      nodeAgent = {
-        enablePolicyEventLogs = "true"
-      }
-    })
     resolve_conflicts = "OVERWRITE"
   }
   coredns = {
