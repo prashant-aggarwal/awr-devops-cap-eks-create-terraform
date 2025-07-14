@@ -54,7 +54,6 @@ fargate_profiles = {
 
 # EKS Addons Configuration
 addons = {
-addons = {
   vpc-cni = {
     version = "latest"
     configuration_values = {
