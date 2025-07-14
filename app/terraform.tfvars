@@ -1,5 +1,5 @@
 # EKS Cluster Configuration
-aws_region      = "us-east-2"
+aws_region      = "us-east-1"
 cluster_name    = "pa-cap-eks-cluster"
 cluster_version = "1.32"
 
