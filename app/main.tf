@@ -36,12 +36,14 @@ module "eks" {
 module "node_groups" {
   source = "../modules/node-groups"
 
+  vpc_cidr             = var.vpc_cidr
+  availability_zones   = var.availability_zones
+  private_subnet_cidrs = var.private_subnet_cidrs
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  node_groups          = var.node_groups
+  
   cluster_name     = module.eks.cluster_name
   cluster_endpoint = module.eks.cluster_endpoint
-  cluster_ca_cert  = module.eks.cluster_certificate_authority_data
-  subnet_ids       = module.vpc.private_subnet_ids
-  
-  node_groups = var.node_groups
   
   depends_on = [module.eks]
 }
@@ -62,11 +64,11 @@ module "fargate" {
 module "addons" {
   source = "../modules/addons"
 
-  cluster_name    = module.eks.cluster_name
   cluster_version = var.cluster_version
-  oidc_issuer_url = module.eks.cluster_oidc_issuer_url
-  
   addons = var.addons
+  
+  cluster_name    = module.eks.cluster_name
+  oidc_issuer_url = module.eks.cluster_oidc_issuer_url
   
   depends_on = [module.eks, module.node_groups]
 }
