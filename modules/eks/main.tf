@@ -104,6 +104,8 @@ data "aws_caller_identity" "current" {}
 resource "aws_eks_access_entry" "api_access_entry" {
   cluster_name      = var.cluster_name
   principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/EKSServiceDeploymentRole"
+
+  depends_on = [aws_eks_cluster.main]
 }
 
 resource "aws_eks_access_policy_association" "example" {
