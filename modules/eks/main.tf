@@ -52,6 +52,10 @@ resource "aws_eks_cluster" "main" {
   role_arn = aws_iam_role.eks_cluster.arn
   version  = var.cluster_version
 
+  access_config {
+    authentication_mode = "API_AND_CONFIG_MAP"
+  }
+
   vpc_config {
     subnet_ids              = var.subnet_ids
     endpoint_private_access = true
@@ -92,4 +96,45 @@ resource "aws_iam_openid_connect_provider" "eks" {
   tags = {
     Name = "${var.cluster_name}-eks-irsa"
   }
+}
+
+# Access entry to allow API calls
+data "aws_caller_identity" "current" {}
+
+resource "aws_eks_access_entry" "api_access_entry" {
+  cluster_name      = var.cluster_name
+  principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/EKSServiceDeploymentRole"
+
+  depends_on = [aws_eks_cluster.main]
+}
+
+resource "aws_eks_access_policy_association" "api_access_entry_policy_association" {
+  cluster_name  = var.cluster_name
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  principal_arn = aws_eks_access_entry.api_access_entry.principal_arn
+
+  access_scope {
+    type       = "cluster"
+  }
+
+  depends_on = [aws_eks_access_entry.api_access_entry]
+}
+
+resource "aws_eks_access_entry" "user_access_entry" {
+  cluster_name      = var.cluster_name
+  principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${data.aws_caller_identity.current.user_id}"
+
+  depends_on = [aws_eks_cluster.main]
+}
+
+resource "aws_eks_access_policy_association" "user_access_entry_policy_association" {
+  cluster_name  = var.cluster_name
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  principal_arn = aws_eks_access_entry.user_access_entry.principal_arn
+
+  access_scope {
+    type       = "cluster"
+  }
+
+  depends_on = [aws_eks_access_entry.user_access_entry]
 }
