@@ -122,7 +122,7 @@ resource "aws_eks_access_policy_association" "api_access_entry_policy_associatio
 
 resource "aws_eks_access_entry" "user_access_entry" {
   cluster_name      = var.cluster_name
-  principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${data.aws_caller_identity.current.user_id}"
+  principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/eruser311"
 
   depends_on = [aws_eks_cluster.main]
 }
