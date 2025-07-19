@@ -8,6 +8,18 @@ pipeline {
 
 	// Multistage pipeline
     stages {
+		// Stage 0 - Display environment variables
+		stage('Display environment variables') {
+            steps {
+                script {
+                    echo "Using config:"
+                    echo "  AWS_REGION: ${env.AWS_REGION}"
+                    echo "  S3_BUCKET:  ${env.S3_BUCKET}"
+					echo "  S3_KEY:     ${env.S3_KEY}"
+                }
+            }
+        }
+
 		// Stage 1 - Install Terraform
         stage('Install Terraform') {
             steps {
@@ -45,19 +57,24 @@ pipeline {
 								terraform apply -auto-approve
 							'''
 						} catch (exception) {
-							echo "❌ Failed to create EKS cluster: ${exception}"
-							error("Halting pipeline due to EKS cluster creation failure.")
+							error("Deployment failed: ${e}")
 						}
 					}
-				}
-			}
-		}
+                }
+            }
+        }
     }
 
     // Cleanup the workspace in the end
 	post {
         always {
             cleanWs()
+        }
+		success {
+            echo 'Pipeline completed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed.'
         }
     }
 }
