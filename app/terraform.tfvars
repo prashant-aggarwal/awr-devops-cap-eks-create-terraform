@@ -1,6 +1,6 @@
 # EKS Cluster Configuration
 aws_region      = "us-east-1"
-cluster_name    = "cap-eks-cluster"
+cluster_name    = "eks-cap-cluster"
 cluster_version = "1.32"
 
 # VPC Configuration
