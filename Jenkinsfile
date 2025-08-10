@@ -8,32 +8,38 @@ pipeline {
 
 	// Multistage pipeline
     stages {
-		// Stage 1 - Checkout code repository
-        stage('Checkout Code') {
+		// Stage 0 - Display environment variables
+		stage('Display environment variables') {
             steps {
-                git branch: 'main',
-                    credentialsId: 'Github',
-                    url: 'https://github.com/prashant-aggarwal/awr-devops-cap-eks-create-terraform.git'
+                script {
+                    echo "Using config:"
+                    echo "  AWS_REGION: ${env.AWS_REGION}"
+                    echo "  S3_BUCKET:  ${env.S3_BUCKET}"
+					echo "  S3_KEY:     ${env.S3_KEY}"
+                }
             }
         }
 
-		// Stage 2 - Install Terraform
+		// Stage 1 - Install Terraform
         stage('Install Terraform') {
             steps {
                 sh '''
-					echo "Installing terraform..."
-					curl -O https://releases.hashicorp.com/terraform/1.12.2/terraform_1.12.2_linux_amd64.zip
-					unzip terraform_1.12.2_linux_amd64.zip
-					chmod +x ./terraform
-					mkdir -p $HOME/bin
-					cp ./terraform $HOME/bin/terraform
-					export PATH=$HOME/bin:$PATH
-					terraform version
+					if ! command -v terraform >/dev/null 2>&1; then
+						echo "Installing terraform..."
+						curl -O https://releases.hashicorp.com/terraform/1.12.2/terraform_1.12.2_linux_amd64.zip
+						unzip terraform_1.12.2_linux_amd64.zip
+						chmod +x ./terraform
+						mkdir -p $HOME/bin
+						cp ./terraform $HOME/bin/terraform
+						export PATH=$HOME/bin:$PATH
+					else
+						echo "terraform is already installed: $(terraform version)"
+					fi
                 '''
             }
         }
 		
-		// Stage 3 - Deploy EKS Cluster
+		// Stage 2 - Deploy EKS Cluster
         stage('Deploy EKS Cluster') {
             steps {
 				script {
@@ -51,19 +57,24 @@ pipeline {
 								terraform apply -auto-approve
 							'''
 						} catch (exception) {
-							echo "❌ Failed to create EKS cluster: ${exception}"
-							error("Halting pipeline due to EKS cluster creation failure.")
+							error("Deployment failed: ${exception}")
 						}
 					}
-				}
-			}
-		}
+                }
+            }
+        }
     }
 
     // Cleanup the workspace in the end
 	post {
         always {
             cleanWs()
+        }
+		success {
+            echo 'Pipeline completed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed.'
         }
     }
 }
